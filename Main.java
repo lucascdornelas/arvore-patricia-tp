@@ -74,8 +74,15 @@ public class Main {
                 break;
             }
 
-            dicionario.insere(new Item(c,input.i,input.j));
-            System.out.println ("Inseriu chave "+ i + ": " + c.length() + " - Linha " + input.i + " / Coluna " + input.j);
+            int teste = 0;
+            int testeAlgo = c.charAt(teste);
+            String resposta = Integer.toBinaryString(testeAlgo);
+            if(resposta.equals("100000")) {
+                dicionario.insere(new Item(c,input.i,input.j));
+                System.out.println("carai");
+            }
+                
+            System.out.println ("Inseriu chave "+ i + ": " + c + resposta +" - Linha " + input.i + " / Coluna " + input.j);
         }
         System.out.println("");
 
