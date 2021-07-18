@@ -2,7 +2,8 @@ import java.util.ArrayList;
 
 public class ArvorePatricia {
     public static final int nBitsChar = 8;
-    private static abstract class PatNo { }
+    private static abstract class PatNo { 
+    }
     private static class PatNoInt extends PatNo {
         int index; PatNo esq, dir;
     }
@@ -15,19 +16,19 @@ public class ArvorePatricia {
             instancias = new ArrayList<int[]>();
         }
 
-        public void addInstacia(int i,int j)
+        public void addInstacia(int linha, int coluna)
         {
-            int[] arr = {i,j};
-            boolean existe = false;
-            for(int a=0; a<this.instancias.size();a++) {
-                int[] aux = this.instancias.get(a);
-                if(aux[0] == i && aux[1] == j) {
-                    existe = true;
+            int[] array = {linha,coluna};
+            boolean b = false;
+            for(int i = 0; i < this.instancias.size(); i++) {
+                int[] aux = this.instancias.get(i);
+                if(aux[0] == linha && aux[1] == coluna) {
+                    b = true;
                     break;
                 }
             }
-            if(!existe)
-                this.instancias.add(arr);
+            if(!b)
+                this.instancias.add(array);
         }
     }
 
@@ -35,14 +36,14 @@ public class ArvorePatricia {
     private int nbitsChave;
 
     // Retorna o i-esimo bit da chave k a partir da esquerda
-    private int bit (int i, String str) {
-        if (i == 0) 
+    private int bit (int index, String str) {
+        if (index == 0) 
             return 0;
-        i--; 
-        int c = (int)(str.charAt((int)(i / nBitsChar)));
-        for (int j = 1; j <= nBitsChar - i % nBitsChar; j++) 
-            c = c/2;
-        return c % 2;
+        index--; 
+        int chave = (int)(str.charAt((int)(index / nBitsChar)));
+        for (int j = 1; j <= nBitsChar - index % nBitsChar; j++) 
+            chave = chave/2;
+        return chave % 2;
     }
 
     // Verifica se p e no externo
@@ -51,29 +52,30 @@ public class ArvorePatricia {
         return classe.getName().equals(PatNoExt.class.getName());
     }
 
-    private PatNo criaNoInt (int i, PatNo esq, PatNo dir) {
+    private PatNo criaNoInt (int index, PatNo esq, PatNo dir) {
         PatNoInt p = new PatNoInt ();
-        p.index = i; 
+        p.index = index; 
         p.esq = esq; 
         p.dir = dir;
         return p;
     }
 
-    private PatNo criaNoExt (Item str) {
+    private PatNo criaNoExt (Item it) {
         PatNoExt p = new PatNoExt ();
-        p.chave = str.chave;
-        p.addInstacia(str.linha,str.coluna);
+        p.chave = it.chave;
+        p.addInstacia(it.linha,it.coluna);
         return p;
     }
 
     private void pesquisa (String str, PatNo t) {
         if (this.eExterno (t)) {
             PatNoExt aux = (PatNoExt)t;
+            // se a string estiver na chave
             if (aux.chave.equals(str)) {
                 System.out.println ("Elemento encontrado");
-                for(int i=0; i<aux.instancias.size();i++) {
+                // imprimindo as linhas de ocorrencias
+                for(int i=0; i<aux.instancias.size(); i++) 
                     System.out.println("Linha "+aux.instancias.get(i)[0]+" / Coluna "+aux.instancias.get(i)[1]);
-                }
             }
             else
                 System.out.println ("Elemento nao encontrado");
@@ -87,24 +89,24 @@ public class ArvorePatricia {
         }
     }
 
-    private PatNo insereEntre (Item k, PatNo t, int i) {
+    private PatNo insereEntre (Item it, PatNo t, int index) {
         PatNoInt aux = null;
         if (!this.eExterno (t)) 
             aux = (PatNoInt)t;
 
         // Cria um novo no externo
-        if (this.eExterno (t) || (i < aux.index)) { 
-            PatNo p = this.criaNoExt (k);
-            if (this.bit (i, k.chave) == 1) 
-                return this.criaNoInt (i, t, p);
+        if (this.eExterno (t) || (index < aux.index)) { 
+            PatNo p = this.criaNoExt (it);
+            if (this.bit (index, it.chave) == 1) 
+                return this.criaNoInt (index, t, p);
             else 
-                return this.criaNoInt (i, p, t);
+                return this.criaNoInt (index, p, t);
         }
         else {
-            if (this.bit (aux.index, k.chave) == 1)
-                aux.dir = this.insereEntre (k, aux.dir, i);
+            if (this.bit (aux.index, it.chave) == 1)
+                aux.dir = this.insereEntre (it, aux.dir, index);
             else 
-                aux.esq = this.insereEntre (k, aux.esq, i);
+                aux.esq = this.insereEntre (it, aux.esq, index);
             return aux;
         }
     }
@@ -117,7 +119,8 @@ public class ArvorePatricia {
                 PatNoInt aux = (PatNoInt)p;
                 if (this.bit (aux.index, it.chave) == 1) 
                     p = aux.dir;
-                else p = aux.esq;
+                else 
+                    p = aux.esq;
             }
             PatNoExt aux = (PatNoExt)p;
             // acha o primeiro bit diferente
@@ -135,16 +138,16 @@ public class ArvorePatricia {
         }
     }
 
-    private void central (PatNo pai, PatNo filho, String str) {
+    private void centro (PatNo pai, PatNo filho, String str) {
         if (filho != null) {
             if (!this.eExterno (filho)) {
                 PatNoInt aux = (PatNoInt)filho;
-                central (filho, aux.esq, "Esq");
+                centro (filho, aux.esq, "Esq");
                 if (pai != null)
                     System.out.println ("Pai: "+ ((PatNoInt)pai).index + " " + str+ " Int: " + aux.index);
                 else 
                     System.out.println ("Pai: "+ pai + " " + str+ " Int: " + aux.index);
-                central (filho, aux.dir, "Dir");
+                centro (filho, aux.dir, "Dir");
             } else {
                 PatNoExt aux = (PatNoExt)filho;
                 if (pai != null)
@@ -156,7 +159,7 @@ public class ArvorePatricia {
     }
 
     public void imprime () {
-        this.central (null, this.raiz, "Raiz");
+        this.centro (null, this.raiz, "Raiz");
     }
 
     public ArvorePatricia(int nbitsChave) {
