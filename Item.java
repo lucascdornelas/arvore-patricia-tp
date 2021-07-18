@@ -1,14 +1,13 @@
 public class Item {
     public String chave;
     public static int size;
-    // outros componentes do registro
-    public int i;
-    public int j;
+    public int linha;
+    public int coluna;
 
     public Item (String chave,int i,int j) {
         this.chave = chave;
-        this.i = i;
-        this.j = j;
+        this.linha = i;
+        this.coluna = j;
         Item.size = this.chave.length();
     }
 }

@@ -1,16 +1,16 @@
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
+    public static final int nCharPalavra = 16;
+    public static final int nBitsChar = 8;
     private static class Str2bin{
-
-        public static String ch16(String c){
+        public static String char16(String c){
             // Garantir 16 caracteres
-            if(c.length()>16)
-                c = c.substring(0,15);
+            if(c.length()>nCharPalavra)
+                c = c.substring(0,nCharPalavra-1);
             else
-                while (c.length()<16)
+                while (c.length()<nCharPalavra)
                     c = c.concat(" ");
             return c;
         }
@@ -21,11 +21,10 @@ public class Main {
             
             for (byte b : bytes) {
                 int val = b;
-                for (int i = 0; i < 8; i++) {
-                    binary.append((val & 128) == 0 ? 0 : 1);
+                for (int i = 0; i < nBitsChar; i++) {
+                    binary.append((val & nCharPalavra*nBitsChar) == 0 ? 0 : 1);
                     val <<= 1;
                 }
-            
             }
             return binary.toString();
         }
@@ -33,11 +32,12 @@ public class Main {
         public static String str(String c,int nBitChave) {
             String k = new String("");
 
-            for(int i=0; i < nBitChave; i++){
+            for(int i = 0; i < nBitChave; i++){
                 String str = new String("");
-                for(int j=0; j<8; j++){
+                for(int j = 0; j < nBitsChar; j++){
                     str = str.concat(c.substring(j,j+1));
                 }
+
                 byte b = Byte.parseByte(str); 
                 int val = b;
                 char ch = (char)val;
@@ -49,7 +49,7 @@ public class Main {
     }
 
     public static void main (String[] args) {
-        ArvorePatricia dicionario = new ArvorePatricia(128);
+        ArvorePatricia dicionario = new ArvorePatricia(nCharPalavra*nBitsChar);
 
         if(args[0].length() == 0) {
             System.out.println("Error: nenhum arquivo passado por parametro.");
@@ -69,20 +69,20 @@ public class Main {
             String c;
             try{
                 c = input.nextWord().toLowerCase();
-                c = Str2bin.ch16(c); // garantir 16 caracteres
+
+                //verificando se a string e vazia
+                if(c.compareTo(" ") == (-1)) 
+                    c = input.nextWord().toLowerCase();
+                    
+                //garantir 16 caracteres no caractere     
+                c = Str2bin.char16(c); 
             }catch (Exception e){
                 break;
             }
 
-            int teste = 0;
-            int testeAlgo = c.charAt(teste);
-            String resposta = Integer.toBinaryString(testeAlgo);
-            if(resposta.equals("100000")) {
-                dicionario.insere(new Item(c,input.i,input.j));
-                System.out.println("carai");
-            }
+            dicionario.insere(new Item(c,input.linhaMatriz,input.colunaMatriz));
                 
-            System.out.println ("Inseriu chave "+ i + ": " + c + resposta +" - Linha " + input.i + " / Coluna " + input.j);
+            System.out.println ("Inseriu chave "+ i + ": " + c + c.charAt(0) + " - Linha " + input.linhaMatriz + " / Coluna " + input.colunaMatriz);
         }
         System.out.println("");
 
@@ -105,7 +105,7 @@ public class Main {
         while(search_input.hasNext()) {
             String c = search_input.nextLine();
             System.out.println ("Pesquisando chave" + i + ": " + c);
-            c = Str2bin.ch16(c);
+            c = Str2bin.char16(c);
             dicionario.pesquisa(c);
             i++;
         }
@@ -116,6 +116,6 @@ public class Main {
             System.out.println("Erro: não foi possível fechar arquivo");
         }
 
-//        search_input.close();
+        search_input.close();
     }
 }

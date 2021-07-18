@@ -4,11 +4,10 @@ public class ExtraiPalavra {
     private BufferedReader arqDelim, arqTxt;
     private StringTokenizer work;
     private String delimitadores;
-    public int i;
-    public int j;
+    public int linhaMatriz;
+    public int colunaMatriz;
 
     public ExtraiPalavra (String nomeArqDelim, String nomeArqTxt) throws Exception {
-
         this.arqDelim = new BufferedReader (new FileReader (nomeArqDelim));
         this.arqTxt = new BufferedReader (new FileReader (nomeArqTxt));
 
@@ -17,30 +16,27 @@ public class ExtraiPalavra {
         this.delimitadores = arqDelim.readLine() + '\r' + '\n' + (char)crlf;
 
         this.work = null;
-        this.i=0;
-        this.j=0;
+        this.linhaMatriz=0;
+        this.colunaMatriz=0;
     }
 
     public String nextWord() throws Exception{
         if (work == null || !work.hasMoreTokens()) {
-            String linha = arqTxt.readLine(); i++; j=0;
+            String linha = arqTxt.readLine(); linhaMatriz++; colunaMatriz=0;
 
-            if (linha == null) {
+            if (linha == null) 
                 return null;
-            }
+
             this.work = new StringTokenizer (linha, this.delimitadores);
 
-            if (!work.hasMoreTokens()) {
-                return ""; // ignora delimitadores
-            }
+            if (!work.hasMoreTokens()) 
+                return "";
         }
-        j++;
-
+        colunaMatriz++;
         return this.work.nextToken();
     }
     
     public void fecharArquivos () throws Exception {
-
         this.arqDelim.close();
         this.arqTxt.close();
     }

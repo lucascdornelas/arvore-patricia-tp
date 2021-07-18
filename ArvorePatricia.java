@@ -1,12 +1,14 @@
 import java.util.ArrayList;
 
 public class ArvorePatricia {
+    public static final int nBitsChar = 8;
     private static abstract class PatNo { }
     private static class PatNoInt extends PatNo {
         int index; PatNo esq, dir;
     }
     private static class PatNoExt extends PatNo {
-        String chave; // @{\it O tipo da chave depende da aplica\c{c}\~ao}@
+        // O tipo da chave depende da aplicacao
+        String chave; 
         ArrayList<int[]> instancias;
 
         public PatNoExt() {
@@ -24,7 +26,6 @@ public class ArvorePatricia {
                     break;
                 }
             }
-
             if(!existe)
                 this.instancias.add(arr);
         }
@@ -33,17 +34,18 @@ public class ArvorePatricia {
     private PatNo raiz;
     private int nbitsChave;
 
-    // @{\it Retorna o i-\'esimo bit da chave k a partir da esquerda}@
-    private int bit (int i, String k) {
+    // Retorna o i-esimo bit da chave k a partir da esquerda
+    private int bit (int i, String str) {
         if (i == 0) 
             return 0;
-        i--; // trata indexação começando em 1 (tipico do ziviani)
-        int c = (int)(k.charAt((int)(i/8)));
-        for (int j = 1; j <= 8 - i%8; j++) c = c/2;
-            return c % 2;
+        i--; 
+        int c = (int)(str.charAt((int)(i / nBitsChar)));
+        for (int j = 1; j <= nBitsChar - i % nBitsChar; j++) 
+            c = c/2;
+        return c % 2;
     }
 
-    // @{\it Verifica se p \'e n\'o externo}@
+    // Verifica se p e no externo
     private boolean eExterno (PatNo p) {
         Class classe = p.getClass ();
         return classe.getName().equals(PatNoExt.class.getName());
@@ -51,21 +53,23 @@ public class ArvorePatricia {
 
     private PatNo criaNoInt (int i, PatNo esq, PatNo dir) {
         PatNoInt p = new PatNoInt ();
-        p.index = i; p.esq = esq; p.dir = dir;
+        p.index = i; 
+        p.esq = esq; 
+        p.dir = dir;
         return p;
     }
 
-    private PatNo criaNoExt (Item k) {
+    private PatNo criaNoExt (Item str) {
         PatNoExt p = new PatNoExt ();
-        p.chave = k.chave;
-        p.addInstacia(k.i,k.j);
+        p.chave = str.chave;
+        p.addInstacia(str.linha,str.coluna);
         return p;
     }
 
-    private void pesquisa (String k, PatNo t) {
+    private void pesquisa (String str, PatNo t) {
         if (this.eExterno (t)) {
             PatNoExt aux = (PatNoExt)t;
-            if (aux.chave.equals(k)) {
+            if (aux.chave.equals(str)) {
                 System.out.println ("Elemento encontrado");
                 for(int i=0; i<aux.instancias.size();i++) {
                     System.out.println("Linha "+aux.instancias.get(i)[0]+" / Coluna "+aux.instancias.get(i)[1]);
@@ -76,10 +80,10 @@ public class ArvorePatricia {
         }
         else {
             PatNoInt aux = (PatNoInt)t;
-            if (this.bit (aux.index, k) == 0) 
-                pesquisa (k, aux.esq);
+            if (this.bit (aux.index, str) == 0) 
+                pesquisa (str, aux.esq);
             else 
-                pesquisa (k, aux.dir);
+                pesquisa (str, aux.dir);
         }
     }
 
@@ -87,7 +91,9 @@ public class ArvorePatricia {
         PatNoInt aux = null;
         if (!this.eExterno (t)) 
             aux = (PatNoInt)t;
-        if (this.eExterno (t) || (i < aux.index)) { // @{\it Cria um novo n\'o externo}@
+
+        // Cria um novo no externo
+        if (this.eExterno (t) || (i < aux.index)) { 
             PatNo p = this.criaNoExt (k);
             if (this.bit (i, k.chave) == 1) 
                 return this.criaNoInt (i, t, p);
@@ -103,62 +109,65 @@ public class ArvorePatricia {
         }
     }
 
-    private PatNo insere (Item k, PatNo t) {
-        if (t == null) return this.criaNoExt (k);
+    private PatNo insere (Item it, PatNo t) {
+        if (t == null) return this.criaNoExt (it);
         else {
             PatNo p = t;
             while (!this.eExterno (p)) {
                 PatNoInt aux = (PatNoInt)p;
-                if (this.bit (aux.index, k.chave) == 1) 
+                if (this.bit (aux.index, it.chave) == 1) 
                     p = aux.dir;
                 else p = aux.esq;
             }
             PatNoExt aux = (PatNoExt)p;
-            int i = 1; // @{\it acha o primeiro bit diferente}@
-            while ((i <= this.nbitsChave) && (this.bit (i, k.chave) == this.bit (i, aux.chave))) 
+            // acha o primeiro bit diferente
+            int i = 1; 
+            while ((i <= this.nbitsChave) && (this.bit (i, it.chave) == this.bit (i, aux.chave))) 
                 i++;
             if (i > this.nbitsChave) {
                 System.out.println ("Erro: chave ja esta na arvore");
                 if(this.eExterno(aux))
-                    aux.addInstacia(k.i,k.j);
+                    aux.addInstacia(it.linha,it.coluna);
                 return t;
             }
-            else return this.insereEntre (k, t, i);
+            else 
+                return this.insereEntre (it, t, i);
         }
     }
 
-    private void central (PatNo pai, PatNo filho, String msg) {
+    private void central (PatNo pai, PatNo filho, String str) {
         if (filho != null) {
             if (!this.eExterno (filho)) {
                 PatNoInt aux = (PatNoInt)filho;
-                central (filho, aux.esq, "ESQ");
+                central (filho, aux.esq, "Esq");
                 if (pai != null)
-                    System.out.println ("Pai: "+ ((PatNoInt)pai).index + " " + msg+ " Int: " + aux.index);
+                    System.out.println ("Pai: "+ ((PatNoInt)pai).index + " " + str+ " Int: " + aux.index);
                 else 
-                    System.out.println ("Pai: "+ pai + " " + msg+ " Int: " + aux.index);
-                central (filho, aux.dir, "DIR");
+                    System.out.println ("Pai: "+ pai + " " + str+ " Int: " + aux.index);
+                central (filho, aux.dir, "Dir");
             } else {
                 PatNoExt aux = (PatNoExt)filho;
                 if (pai != null)
-                    System.out.println ("Pai: "+ ((PatNoInt)pai).index + " " + msg+ " Ext: " + aux.chave);
-                else System.out.println ("Pai: "+ pai + " " + msg+ " Ext: " + aux.chave);
+                    System.out.println ("Pai: "+ ((PatNoInt)pai).index + " " + str+ " Ext: " + aux.chave);
+                else 
+                    System.out.println ("Pai: "+ pai + " " + str+ " Ext: " + aux.chave);
             }
         }
     }
 
     public void imprime () {
-        this.central (null, this.raiz, "RAIZ");
+        this.central (null, this.raiz, "Raiz");
     }
 
-    public ArvorePatricia (int nbitsChave) {
+    public ArvorePatricia(int nbitsChave) {
         this.raiz = null; this.nbitsChave = nbitsChave;
     }
 
-    public void pesquisa (String k) { 
+    public void pesquisa(String k) { 
         this.pesquisa (k, this.raiz); 
     }
 
-    public void insere (Item k) { 
+    public void insere(Item k) { 
         this.raiz = this.insere (k, this.raiz); 
     }
 }
