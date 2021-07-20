@@ -1,3 +1,4 @@
+package src;
 import java.io.*;
 import java.util.Scanner;
 
@@ -66,10 +67,13 @@ public class Main {
     
 
     public static void main (String[] args) {
+        System.out.println("Arvore Pátricia - by Ziviani");
+        System.out.println("Trabalho realizado por: Bruna Gomes, Erick Henrique e Lucas C. Dornelas");
+        
         ArvorePatricia dicionario = new ArvorePatricia(nCharPalavra*nBitsChar);
 
         if(args[0].length() == 0) {
-            System.out.println("Error: nenhum arquivo passado por parametro.");
+            System.out.println("Error: nenhum arquivo passado por parâmetro.");
         }
 
         // Abre o arquivo
