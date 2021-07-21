@@ -30,7 +30,7 @@ public class Main {
                         
                 //garantir 16 bits na palavra     
                 str = Str2bin.str16(str); 
-                
+
             }catch (Exception e){
                 break;
             }
