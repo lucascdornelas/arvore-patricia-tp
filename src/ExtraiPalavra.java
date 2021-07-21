@@ -1,3 +1,4 @@
+package src;
 import java.util.StringTokenizer;
 import java.io.*;
 public class ExtraiPalavra {
