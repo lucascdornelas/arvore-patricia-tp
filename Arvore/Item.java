@@ -1,4 +1,3 @@
-package src;
 public class Item {
     public String chave;
     public static int size;
